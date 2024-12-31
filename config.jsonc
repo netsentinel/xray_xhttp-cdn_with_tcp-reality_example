@@ -1,0 +1,123 @@
+{
+  "log": {
+    "error": "/var/log/xray/error.log",
+    "loglevel": "warning"
+  },
+  "dns": {
+    "servers": [
+      "https://208.67.222.222/dns-query",
+      "https://9.9.9.9/dns-query",
+      "https://1.1.1.1/dns-query",
+      "8.8.8.8"
+    ],
+    "queryStrategy": "UseIPv4"
+  },
+  "routing": {
+    "domainStrategy": "IPOnDemand",
+    "rules": [
+      {
+        "inboundTag": [ "xhttp-cdn-tls", "tcp-vless-reality-vision" ],
+        "outboundTag": "block",
+        "protocol": [ "bittorrent" ]
+      },
+      {
+        "inboundTag": [ "xhttp-cdn-tls", "tcp-vless-reality-vision" ],
+        "outboundTag": "block",
+        "domain": [ "geosite:category-ads-all" ]
+      },
+      {
+        "inboundTag": [ "xhttp-cdn-tls", "tcp-vless-reality-vision" ],
+        "outboundTag": "block",
+        "domain": [
+          "geosite:VK", "geosite:YANDEX", "geosite:MAILRU",
+          "regexp:.*\\.(ru|рф|by|kz|ir|dz|ar|af|bh|ba|bw|br|ve|vn|hk|eg|zw|il|in|id|jo|iq|ke|cn|kp|cr|kw|lb|ls|mu|mg|my|mv|ma|mz|md|mn|mm|na|om|pk|pe|sa|sc|rs|sy|th|tz|tn|tr|uy|fj|ph|lk|et|za|jm|az|am|kg|tj|tm|uz|bd|qa|cu|ae)$"
+        ]
+      },
+      {
+        "inboundTag": [ "xhttp-cdn-tls", "tcp-vless-reality-vision" ],
+        "outboundTag": "block",
+        "ip": [
+          "geoip:ru", "geoip:by", "geoip:kz", "geoip:ir", "geoip:bh", "geoip:ba",
+          "geoip:bw", "geoip:br", "geoip:ve", "geoip:vn", "geoip:hk", "geoip:eg",
+          "geoip:zw", "geoip:il", "geoip:in", "geoip:id", "geoip:jo", "geoip:iq",
+          "geoip:ke", "geoip:cn", "geoip:kp", "geoip:cr", "geoip:kw", "geoip:lb",
+          "geoip:ls", "geoip:mu", "geoip:mg", "geoip:my", "geoip:mv", "geoip:ma",
+          "geoip:mz", "geoip:md", "geoip:mn", "geoip:mm", "geoip:na", "geoip:om",
+          "geoip:pk", "geoip:pe", "geoip:sa", "geoip:sc", "geoip:rs", "geoip:sy",
+          "geoip:th", "geoip:tz", "geoip:tn", "geoip:tr", "geoip:uy", "geoip:fj",
+          "geoip:ph", "geoip:lk", "geoip:et", "geoip:za", "geoip:jm", "geoip:az",
+          "geoip:am", "geoip:dz", "geoip:kg", "geoip:tj", "geoip:tm", "geoip:uz",
+          "geoip:bd", "geoip:af", "geoip:ar", "geoip:qa", "geoip:cu", "geoip:ae"
+        ]
+      },
+      {
+        "inboundTag": [ "xhttp-cdn-tls", "tcp-vless-reality-vision" ],
+        "outboundTag": "direct"
+      }
+    ]
+  },
+  "outbounds": [
+    { "tag": "direct", "protocol": "freedom" },
+    { "tag": "block", "protocol": "blackhole" }
+  ],
+  "inbounds": [
+    {
+      "tag": "xhttp-cdn-tls",
+      "listen": "0.0.0.0",
+      "port": 777,
+      "protocol": "vless",
+      "settings": {
+        "decryption": "none",
+        "clients": [
+          // cat /proc/sys/kernel/random/uuid
+          { "id": "0358ea85-e758-4139-bddb-98d05265cf4d" },
+          { "id": "13fc17d5-1044-4f27-82c3-2daaf70848b3" }
+        ]
+      },
+      "streamSettings": {
+        "network": "xhttp",
+        "xhttpSettings": {
+          "mode": "stream-up",
+          // tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 16; echo
+          "path": "qhq8AVkC3dOafYDz"
+        },
+        "sniffing": {
+          "enabled": true,
+          "routeOnly": true,
+          "destOverride": [ "quic", "http", "tls" ]
+        }
+      }
+    },
+    {
+      "tag": "tcp-vless-reality-vision",
+      "listen": "0.0.0.0",
+      "port": 888,
+      "protocol": "vless",
+      "settings": {
+        "decryption": "none",
+        "clients": [
+          { "flow": "xtls-rprx-vision", "id": "0358ea85-e758-4139-bddb-98d05265cf4d" },
+          { "flow": "xtls-rprx-vision", "id": "13fc17d5-1044-4f27-82c3-2daaf70848b3" }
+        ]
+      },
+      "streamSettings": {
+        "network": "raw",
+        "security": "reality",
+        "realitySettings": {
+          "dest": "ign.com:443",
+          "serverNames": [ "ign.com" ],
+          // xray x25519
+          // Private key: cPYRncL2nCQXkQNJhGDOazSmOlba_c3TC7L-GDegFTE
+          // Public key: 3L7mhmQDgrGxL66Hnoclafw23GXw9noj7wSRwoZYal8
+          "privateKey": "cPYRncL2nCQXkQNJhGDOazSmOlba_c3TC7L-GDegFTE",
+          "shortIds": [ "", "341df03c1b9bb445" ] // openssl rand -hex 8
+        },
+        "sniffing": {
+          "enabled": true,
+          "routeOnly": true,
+          "destOverride": [ "quic", "http", "tls" ]
+        }
+      }
+    }
+  ]
+}

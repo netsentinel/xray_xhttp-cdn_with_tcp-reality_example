@@ -1,0 +1,38 @@
+services: 
+  
+  cloak:
+    restart: unless-stopped
+    container_name: vpn-1-filebrowser-cloak
+    image: filebrowser/filebrowser
+    environment:
+      # creds: admin PNh62Halqs3VU8Fr
+      FB_DATABASE: /fbdb/database.db
+    volumes:
+      - ./containers/filebrowser/data/:/srv/
+      - ./containers/filebrowser/database/:/fbdb/
+
+  xray:
+    restart: unless-stopped
+    container_name: vpn-1-xray
+    image: ghcr.io/xtls/xray-core
+    volumes:
+      - ./config.jsonc:/etc/xray/config.json
+      - ./containers/xray/logs/:/var/log/xray/
+    depends_on:
+      - cloak
+
+  nginx:
+    restart: unless-stopped
+    container_name: vpn-1-nginx
+    image: nginx
+    ports:
+      - 443:443
+    volumes:
+      - ./selfsigned.crt:/etc/nginx/selfsigned.crt
+      - ./selfsigned.key:/etc/nginx/selfsigned.key
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx.tls.conf:/etc/nginx/nginx.tls.conf
+      - ./nginx.cdn.conf:/etc/nginx/nginx.cdn.conf
+      - ./containers/nginx/logs/:/etc/nginx/logs/
+    depends_on:
+      - xray
