@@ -14,7 +14,7 @@ services:
   xray:
     restart: unless-stopped
     container_name: vpn-1-xray
-    image: ghcr.io/xtls/xray-core
+    image: teddysun/xray
     volumes:
       - ./config.jsonc:/etc/xray/config.json
       - ./containers/xray/logs/:/var/log/xray/
